@@ -1,10 +1,10 @@
 
 import java.util.List;
 
-public interface Graph {
-	public void add(Stad ny);
-	public void connect(Stad from, Stad to, String n, int v);
-	public List<Edge> getEdgesFrom(Stad std);
-	public List<Edge> getEdgesBetween(Stad from, Stad to);
+public interface Graph <T>{
+	public void add(T ny);
+	public void connect(T from, T to, String n, int v);
+	public List<Edge<T>> getEdgesFrom(T obj);
+	public List<Edge<T>> getEdgesBetween(T from, T to);
 	
 }

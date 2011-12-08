@@ -1,15 +1,15 @@
-public class Edge {
-	private Stad dest;
+public class Edge<T> {
+	private T dest;
 	private String namn;
 	private int vikt;
 
-	public Edge(Stad dest, String namn, int vikt) {
+	public Edge(T dest, String namn, int vikt) {
 		this.dest = dest;
 		this.namn = namn;
 		this.vikt = vikt;
 	}
 
-	public Stad getDest() {
+	public T getDest() {
 		return dest;
 	}
 

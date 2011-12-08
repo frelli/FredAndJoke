@@ -1,10 +1,10 @@
 import java.util.*;
 
-public class ListGraph implements Graph {
+public class ListGraph<T> implements Graph<T> {
 	/*
 	 * Själva mappen som håller koll på alla noder
 	 */
-	private Map<Stad, List<Edge>> nodes = new HashMap<Stad, List<Edge>>();
+	private  Map<T, List<Edge<T>>> nodes = new HashMap<T, List<Edge<T>>>();
 
 	/**
 	 * Denna metod lägger till en ny stad i grafen. Om staden redan är tillagd
@@ -13,7 +13,7 @@ public class ListGraph implements Graph {
 	 * @param ny
 	 *            Staden som skall adderas
 	 * */
-	public void add(Stad ny) {
+	public void add(T ny) {
 		/*
 		 * Kontroll så att man inte lägger in en stad som redan finns
 		 */
@@ -21,7 +21,7 @@ public class ListGraph implements Graph {
 			/*
 			 * Skapar nytt set av en stad med en arraylist för dess edges
 			 */
-			nodes.put(ny, new ArrayList<Edge>());
+			nodes.put(ny, new ArrayList<Edge<T>>());
 		}
 	}
 
@@ -39,12 +39,12 @@ public class ListGraph implements Graph {
 	 *            förbindelsen kräver
 	 * 
 	 * */
-	public void connect(Stad from, Stad to, String n, int v) {
+	public void connect(T from, T to, String n, int v) {
 		/*
 		 * Hämtar ArrayList<Edge> från mappen till objektet
 		 */
-		List<Edge> toList = nodes.get(to);
-		List<Edge> fromList = nodes.get(from);
+		List<Edge<T>> toList = nodes.get(to);
+		List<Edge<T>> fromList = nodes.get(from);
 
 		/*
 		 * Kontrollerar att städerna finns inlagda i ListGraph
@@ -56,8 +56,8 @@ public class ListGraph implements Graph {
 		/*
 		 * Skapar edge-objekt för både till- och frånstaden
 		 */
-		Edge eFrom = new Edge(to, n, v);
-		Edge eTo = new Edge(from, n, v);
+		Edge<T> eFrom = new Edge<T>(to, n, v);
+		Edge<T> eTo = new Edge<T>(from, n, v);
 
 		/*
 		 * Här läggs en edge för vardera stad till i dess arrayList. Anledningen
@@ -76,8 +76,8 @@ public class ListGraph implements Graph {
 	 *            Staden som man vill kontrollera kopplingar ifrån och till.
 	 * @return Returnerar en ArrayList med stadens kopplingar
 	 * */
-	public List<Edge> getEdgesFrom(Stad std) {
-		return new ArrayList<Edge>(nodes.get(std));
+	public List<Edge<T>> getEdgesFrom(T std) {
+		return new ArrayList<Edge<T>>(nodes.get(std));
 	}
 
 	/**
@@ -98,12 +98,12 @@ public class ListGraph implements Graph {
 	 *         endast fylls med edge-objekten från staden som skickas med som
 	 *         det första argumentet.
 	 * */
-	public List<Edge> getEdgesBetween(Stad from, Stad to) {
+	public List<Edge<T>> getEdgesBetween(T from, T to) {
 		/*
 		 * Listan som kommer att returneras och fyllas med edge-objekten från
 		 * staden "from" där destination är staden "to"
 		 */
-		List<Edge> edgesBetween = new ArrayList<Edge>();
+		List<Edge<T>> edgesBetween = new ArrayList<Edge<T>>();
 
 		/*
 		 * Kontrollerar att städerna som skickas med i argumenten finns inlagda
@@ -119,8 +119,8 @@ public class ListGraph implements Graph {
 		 * Dessa gås sedan igenom var och en och dess destination matchas mot
 		 * staden "to", om en träff uppstår så adderas edgen till edgesBetween.
 		 */
-		List<Edge> fromToEdges = nodes.get(from);
-		for (Edge e : fromToEdges) {
+		List<Edge<T>> fromToEdges = nodes.get(from);
+		for (Edge<T> e : fromToEdges) {
 			if (e.getDest() == to)
 				edgesBetween.add(e);
 		}
@@ -135,7 +135,7 @@ public class ListGraph implements Graph {
 		 * entry = hela setet (key+map), loopar alltså igenom hela nodes, och me
 		 * blir en tempvariabel för varje set
 		 */
-		for (Map.Entry<Stad, List<Edge>> me : nodes.entrySet()) {
+		for (Map.Entry<T, List<Edge<T>>> me : nodes.entrySet()) {
 			str += me.getKey() + ": " + me.getValue() + "\n";
 		}
 

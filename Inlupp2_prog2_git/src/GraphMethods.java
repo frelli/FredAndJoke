@@ -1,7 +1,7 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class GraphMethods {
+public class GraphMethods<T>{
 
 	private static void depthFirstSearch(Graph g, Set<Stad> visited,
 			Stad current) {
@@ -12,13 +12,13 @@ public class GraphMethods {
 
 		/*
 		 * För varje stad "current" gås alla dess edges (kopplingar) igenom. För
-		 * att få frpm en vilken stad kopplingen är kopplad till så anropas
+		 * att få fram vilken stad kopplingen är kopplad till så anropas
 		 * metoden getDest() från Stad-klassen.
 		 * 
 		 * Om staden inte finns med i visited så anropas dFs igen rekursivt och
 		 * processen fortsätter
 		 */
-		for (Edge e : g.getEdgesFrom(current)) {
+		for (Edge<T> e : g.getEdgesFrom(current)) {
 			Stad to = e.getDest();
 
 			if (!visited.contains(to))

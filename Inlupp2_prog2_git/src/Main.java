@@ -4,7 +4,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		ListGraph karta = new ListGraph();
+		Graph<Stad> karta = new ListGraph<Stad>();
 
 		Stad s1 = new Stad("Kista");
 		karta.add(s1);
