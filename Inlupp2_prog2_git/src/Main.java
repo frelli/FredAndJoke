@@ -6,25 +6,36 @@ public class Main
 	{
 		Graph<Stad> karta = new ListGraph<Stad>();
 
-		Stad s1 = new Stad("Kista");
-		karta.add(s1);
-		Stad s2 = new Stad("Järfälla");
-		karta.add(s2);
-		Stad s3 = new Stad("Viksjö");
-		karta.add(s3);
+		Stad kista = new Stad("Kista");
+		karta.add(kista);
+		Stad järfälla = new Stad("Järfälla");
+		karta.add(järfälla);
+		Stad husby = new Stad("Husby");
+		karta.add(husby);
+		Stad akalla = new Stad("Akalla");
+		karta.add(akalla);
+		Stad hallonskogen = new Stad("Hallonskogen");
+		karta.add(hallonskogen);
+		Stad täby = new Stad("Täby");
+		karta.add(täby);
 		
-		Stad s4 = new Stad("Akalla");
-		karta.add(s4);
 
-		karta.connect(s1, s2, "Bil", 12);
-		karta.connect(s1, s2, "Per fot", 67);
-		karta.connect(s1, s3, "Bil", 22);
-		karta.connect(s1, s4, "Bil", 8);
-		karta.connect(s2, s4, "Bil", 4);
+		karta.connect(kista, täby, "Bil", 8);
+		karta.connect(kista, hallonskogen, "Per fot", 15);
 		
-		System.out.println(karta.getEdgesBetween(s1, s2));
+		karta.connect(järfälla, akalla, "Bil", 7);
+		karta.connect(järfälla, husby, "Bil", 15);
+		karta.connect(järfälla, täby, "Bil", 10);
+
+		karta.connect(husby, täby, "Bil", 2);
+		
+		karta.connect(akalla, hallonskogen, "Bil", 1);
+
+		karta.connect(hallonskogen, täby, "Bil", 19);
+		
+//		System.out.println(karta.getEdgesBetween(husby, täby));
 //		System.out.println(karta);
-//		System.out.println(karta.getEdgesFrom(s1));
-//		System.out.println(GraphMethods.pathExists(karta, s2, s3));
+		System.out.println(karta.getEdgesFrom(täby));
+//		System.out.println(GraphMethods.pathExists(karta, järfälla, husby));
 	}
 }

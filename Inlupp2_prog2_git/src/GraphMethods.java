@@ -1,10 +1,32 @@
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class GraphMethods<T>{
+public class GraphMethods {
 
-	private static void depthFirstSearch(Graph g, Set<Stad> visited,
-			Stad current) {
+	public static <T> List<Edge<T>> shortestPath(Graph<T> g, T from, T to) {
+		if (!pathExists(g, from, to)) {
+			return null;
+		} else {
+			Map<T, DjikHolder<T>> djikMap = new HashMap<T, DjikHolder<T>>();
+			return shortestPathHelper(g, from, to, djikMap);
+		}
+	}
+
+	private static <T> List<Edge<T>> shortestPathHelper(Graph<T> g, T from,
+			T to, Map<T, DjikHolder<T>> djikMap) {
+
+		DjikHolder<T> djikTemp = new DjikHolder<T>();
+		djikMap.put(from, djikTemp);
+		djikTemp.setDeterminated(true);
+		djikTemp.setFastestTime(0);
+
+		return null;
+	}
+	private static <T> void depthFirstSearch(Graph<T> g, Set<T> visited,
+			T current) {
 		/*
 		 * Varje gång metoden anropas så läggs staden "current" till i visited.
 		 */
@@ -12,14 +34,14 @@ public class GraphMethods<T>{
 
 		/*
 		 * För varje stad "current" gås alla dess edges (kopplingar) igenom. För
-		 * att få fram vilken stad kopplingen är kopplad till så anropas
-		 * metoden getDest() från Stad-klassen.
+		 * att få fram vilken stad kopplingen är kopplad till så anropas metoden
+		 * getDest() från Stad-klassen.
 		 * 
 		 * Om staden inte finns med i visited så anropas dFs igen rekursivt och
 		 * processen fortsätter
 		 */
 		for (Edge<T> e : g.getEdgesFrom(current)) {
-			Stad to = e.getDest();
+			T to = e.getDest();
 
 			if (!visited.contains(to))
 				depthFirstSearch(g, visited, to);
@@ -39,7 +61,7 @@ public class GraphMethods<T>{
 	 * 
 	 * @return Om en koppling finns så returneras true, annars returneras false.
 	 * */
-	public static boolean pathExists(Graph g, Stad from, Stad to) {
+	public static <T> boolean pathExists(Graph<T> g, T from, T to) {
 		/*
 		 * Skapar ett hash-set som skickas med som arg till dFs Detta kommer att
 		 * användas för att addera alla kopplingar som staden "from" har.
@@ -48,7 +70,7 @@ public class GraphMethods<T>{
 		 * funnits med bland de hittade städerna och true returneras, annars
 		 * returneras false
 		 */
-		Set<Stad> visited = new HashSet<Stad>();
+		Set<T> visited = new HashSet<T>();
 		depthFirstSearch(g, visited, from);
 
 		return visited.contains(to);
