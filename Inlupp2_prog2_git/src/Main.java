@@ -6,36 +6,46 @@ public class Main
 	{
 		Graph<Stad> karta = new ListGraph<Stad>();
 
-		Stad kista = new Stad("Kista");
-		karta.add(kista);
-		Stad järfälla = new Stad("Järfälla");
-		karta.add(järfälla);
-		Stad husby = new Stad("Husby");
-		karta.add(husby);
-		Stad akalla = new Stad("Akalla");
-		karta.add(akalla);
-		Stad hallonskogen = new Stad("Hallonskogen");
-		karta.add(hallonskogen);
-		Stad täby = new Stad("Täby");
-		karta.add(täby);
+		Stad A = new Stad("A");
+		karta.add(A);
+		Stad B = new Stad("B");
+		karta.add(B);
+		Stad C = new Stad("C");
+		karta.add(C);
+		Stad D = new Stad("D");
+		karta.add(D);
+		Stad E = new Stad("E");
+		karta.add(E);
+		Stad F = new Stad("F");
+		karta.add(F);
+		Stad G = new Stad("G");
+		karta.add(G);
 		
-
-		karta.connect(kista, täby, "Bil", 8);
-		karta.connect(kista, hallonskogen, "Per fot", 15);
+		karta.connect(A, B, "Bil", 3);
+		karta.connect(A, C, "Bil", 7);
+		karta.connect(A, D, "Bil", 12);
 		
-		karta.connect(järfälla, akalla, "Bil", 7);
-		karta.connect(järfälla, husby, "Bil", 15);
-		karta.connect(järfälla, täby, "Bil", 10);
-
-		karta.connect(husby, täby, "Bil", 2);
+		karta.connect(B, C, "Bil", 11);
 		
-		karta.connect(akalla, hallonskogen, "Bil", 1);
+		karta.connect(B, F, "Bil", 5);
+		
+		karta.connect(C, D, "Bil", 12);
+		karta.connect(C, G, "Bil", 2);
+		
+		karta.connect(D, E, "Bil", 1);
+		karta.connect(D, G, "Bil", 6);
+		
+		karta.connect(E, G, "Bil", 15);
+		
+		karta.connect(F, G, "Bil", 2);
 
-		karta.connect(hallonskogen, täby, "Bil", 19);
+		
 		
 //		System.out.println(karta.getEdgesBetween(husby, täby));
 //		System.out.println(karta);
-		System.out.println(karta.getEdgesFrom(täby));
+//		System.out.println(karta.getEdgesFrom(täby));
+//		System.out.println(karta.getNodes());
+		System.out.println(GraphMethods.shortestPath(karta, B, E));
 //		System.out.println(GraphMethods.pathExists(karta, järfälla, husby));
 	}
 }

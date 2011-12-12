@@ -128,11 +128,11 @@ public class ListGraph<T> implements Graph<T> {
 		return edgesBetween;
 	}
 
-	@Override
-	public Map<T, Edge<T>> getNodes(T obj) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<T, List<Edge<T>>> getNodes() {
+		
+		return new HashMap<T, List<Edge<T>>>(nodes);
 	}
+	
 	
 	public String toString() {
 		String str = "";
@@ -148,5 +148,6 @@ public class ListGraph<T> implements Graph<T> {
 		return str;
 
 	}
+
 
 }
