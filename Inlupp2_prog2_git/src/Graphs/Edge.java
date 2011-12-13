@@ -1,3 +1,4 @@
+package Graphs;
 public class Edge<T> {
 	private T dest;
 	private String namn;

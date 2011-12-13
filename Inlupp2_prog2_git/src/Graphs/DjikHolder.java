@@ -1,3 +1,4 @@
+package Graphs;
 /*
  * En klass som har till uppgift att hålla variabler till T-objekt när 
  * man vill räkna ut den snabbasta vägen mellan två noder i en graph.

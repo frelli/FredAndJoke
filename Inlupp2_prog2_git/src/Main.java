@@ -1,3 +1,7 @@
+import Graphs.Graph;
+import Graphs.GraphMethods;
+import Graphs.ListGraph;
+
 //hej
 //hej2 FRÅN JOAKIM!!!!!!!!!!!
 public class Main
