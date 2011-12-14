@@ -18,7 +18,7 @@ public class PathFinder extends JFrame {
 	// Menyn
 	private JMenuBar menuBar; // menyraden
 	private JMenu arkiv, operations; // de olika menyflikarna
-	private JMenuItem menuNew, menuOpen, menuSave, menuSaveAs; // menyvalen till
+	private JMenuItem menuNew, menuOpen, menuSave, menuSaveAs, menuQuit; // menyvalen till
 																// arkiv
 	private JMenuItem menuFindPath, menuShowConnection, menuNewNode,
 			menuNewConnection, menuChangeConnection; // menyvalen till
@@ -81,6 +81,9 @@ public class PathFinder extends JFrame {
 
 		menuSaveAs = new JMenuItem("Spara som...");
 		arkiv.add(menuSaveAs);
+		
+		menuQuit = new JMenuItem("Avsluta");
+		arkiv.add(menuQuit);
 
 		// Operationsfliken
 		operations = new JMenu("Operationer");
@@ -106,6 +109,7 @@ public class PathFinder extends JFrame {
 		menuChangeConnection = new JMenuItem("Ändra förbindelse");
 		operations.add(menuChangeConnection);
 		menuChangeConnection.addActionListener(new changeConnectionListener());
+//		System.exit(0);
 
 	}
 
