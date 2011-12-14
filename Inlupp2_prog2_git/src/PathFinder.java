@@ -53,6 +53,7 @@ public class PathFinder extends JFrame {
 		setSize(new Dimension(600, 100));
 		setResizable(false);
 		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
 	/*
@@ -157,9 +158,6 @@ public class PathFinder extends JFrame {
 						center.addImage(chooser
 							.getSelectedFile().toString());
 
-						int widthTemp = center.getImgWidth();
-						int heightTemp = center.getImgHeight();
-						// setSize(
 					setSize(center.getImgWidth(), center.getImgHeight());
 					setLocationRelativeTo(null);
 				}

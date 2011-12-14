@@ -49,7 +49,7 @@ public class Main
 //		System.out.println(karta);
 //		System.out.println(karta.getEdgesFrom(täby));
 //		System.out.println(karta.getNodes());
-		System.out.println(GraphMethods.shortestPath(karta, B, E));
+		System.out.println(GraphMethods.shortestPath(karta, C, E));
 //		System.out.println(GraphMethods.pathExists(karta, järfälla, husby));
 	}
 }
