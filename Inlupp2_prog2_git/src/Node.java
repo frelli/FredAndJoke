@@ -4,9 +4,10 @@ import java.awt.Graphics;
 import javax.swing.JComponent;
 
 
-public class Dot extends JComponent{
-	
-	public Dot(int x, int y){
+public class Node extends JComponent{
+	private Stad s;
+
+	public Node(int x, int y){
 		setBounds(x, y, 10, 10);
 	}
 	
@@ -17,5 +18,12 @@ public class Dot extends JComponent{
 		g.fillOval(0, 0, getWidth(), getHeight());
 	}
 	
+	public Stad getS() {
+		return s;
+	}
+	
+	public void setS(Stad s) {
+		this.s = s;
+	}
 
 }

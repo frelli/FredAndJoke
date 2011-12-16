@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class PathFinder extends JFrame {
 	// Menyn
@@ -32,7 +33,7 @@ public class PathFinder extends JFrame {
 	private JPanel panelNorth, panelCenter, panelWest; // huvudpanelerna
 	
 	private CenterPanel center = new CenterPanel();
-
+	private JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
 
 	/*
 	 * Konstruktorn
@@ -146,15 +147,17 @@ public class PathFinder extends JFrame {
 	private class newItemListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent ave) {
-			JFileChooser chooser = new JFileChooser();
-
+			FileNameExtensionFilter fnef = new FileNameExtensionFilter("Bilder", "jpg", "jpeg", "gif","png");
+			chooser.addChoosableFileFilter(fnef);
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.setFileFilter(fnef);
 			int status = chooser.showOpenDialog(null);
 			
 			//Om användaren trycker på open
 			if (status == JFileChooser.APPROVE_OPTION) {
 				String filePath = chooser.getSelectedFile().getAbsolutePath().toLowerCase(); //hela filnamnet+sökväg
 				
-				//Kollar så att filen är en bildfil
+				//Kollar så att filen är en bildfil som blivit vald
 				if (filePath.endsWith(".jpg") || 
 						filePath.endsWith("jpeg")|| 
 						filePath.endsWith(".gif")|| 
@@ -162,7 +165,8 @@ public class PathFinder extends JFrame {
 						center.addImage(chooser
 							.getSelectedFile().toString());
 
-					setSize(center.getImgWidth(), center.getImgHeight());
+					validate();
+					pack();
 					setLocationRelativeTo(null);
 				}
 			}
@@ -182,7 +186,10 @@ public class PathFinder extends JFrame {
 
 		}
 	}
-
+	
+	/*
+	 * Skapa en ny node
+	 */
 	private class newNodeListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 
