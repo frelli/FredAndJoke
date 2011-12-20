@@ -26,6 +26,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Graphs.Edge;
+import Graphs.Graph;
+import Graphs.GraphMethods;
+import Graphs.ListGraph;
+
 public class PathFinder extends JFrame {
 	// Menyn
 	private JMenuBar menuBar; // menyraden
@@ -44,7 +49,7 @@ public class PathFinder extends JFrame {
 	// Paneler
 	private JPanel panelNorth, panelWest, panelWestNorth, panelWestSouth; // huvudpanelerna
 
-	private CenterPanel center = new CenterPanel();
+	private CenterPanel center;
 
 	// Övrigt
 	private JFileChooser chooser = new JFileChooser(
@@ -55,6 +60,7 @@ public class PathFinder extends JFrame {
 	private List<Node> allNodes = new ArrayList<Node>();
 	private MouseListener mL = new MouseListener();
 	private Stad stadFrom, stadTo;
+	private Graph<Stad> graph;
 
 	/*
 	 * Konstruktorn
@@ -64,7 +70,6 @@ public class PathFinder extends JFrame {
 
 		panelNorth = new JPanel(); // Den norra panelen
 		add(BorderLayout.NORTH, panelNorth);
-		add(BorderLayout.CENTER, center);
 
 		initMenu(); // Sätter upp menyn
 		initButtons(); // Sätter upp knapparna
@@ -75,6 +80,24 @@ public class PathFinder extends JFrame {
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+
+	/*
+	 * Kontrollmetod för att se så att användaren har markerat två stycken
+	 * städer
+	 */
+	private int twoNodesCheck() {
+		if (stadFrom != null && stadTo != null)
+			return 1;
+		else {
+			JOptionPane
+					.showMessageDialog(
+							null,
+							"Du måste ha två städer markerade för att kunna utföra denna operation.",
+							"Fel antal städer markerade",
+							JOptionPane.ERROR_MESSAGE);
+			return -1;
+		}
 	}
 
 	/*
@@ -167,6 +190,11 @@ public class PathFinder extends JFrame {
 	private class NewItemListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent ave) {
+			if (center != null)
+				remove(center);
+			center = new CenterPanel();
+			add(BorderLayout.CENTER, center);
+
 			FileNameExtensionFilter fnef = new FileNameExtensionFilter(
 					"Bilder", "jpg", "jpeg", "gif", "png");
 			chooser.addChoosableFileFilter(fnef);
@@ -193,6 +221,7 @@ public class PathFinder extends JFrame {
 						remove(panelWestSouth);
 					}
 
+					// Skapar listorna med tillbehör
 					panelWest = new JPanel();
 					panelWestNorth = new JPanel();
 					panelWestSouth = new JPanel();
@@ -219,6 +248,9 @@ public class PathFinder extends JFrame {
 					panelWest.add(panelWestSouth);
 					add(panelWest, BorderLayout.WEST);
 
+					// Skapar grafen
+					graph = new ListGraph<Stad>();
+
 					validate();
 					pack();
 					setLocationRelativeTo(null);
@@ -231,13 +263,30 @@ public class PathFinder extends JFrame {
 
 	private class FindPathListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
+			if (center == null)
+				return;
+			twoNodesCheck();
 		}
 	}
 
 	private class ShowConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
+			if (center == null)
+				return;
+			if (twoNodesCheck() == 1) {
+				if (GraphMethods.pathExists(graph, stadFrom, stadTo)){
+					ShowConnectionDialog dialog = new ShowConnectionDialog(graph.getEdgesBetween(stadFrom, stadTo), stadFrom, stadTo);
+					JOptionPane.showMessageDialog(null, dialog, "Visa förbindelse", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else {
+					JOptionPane.showMessageDialog(
+							getContentPane(),
+							"Det finns ingen förbindelse mellan "
+									+ stadFrom.getNamn() + " och "
+									+ stadTo.getNamn() + ".", "Fel",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 
@@ -246,9 +295,11 @@ public class PathFinder extends JFrame {
 	 */
 	private class NewNodeListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			Cursor c = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-			center.setCursor(c);
-			center.addMouseListener(mL);
+			if (center != null) {
+				Cursor c = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+				center.setCursor(c);
+				center.addMouseListener(mL);
+			}
 		}
 	}
 
@@ -261,12 +312,13 @@ public class PathFinder extends JFrame {
 			nodeName = JOptionPane.showInputDialog("Platsens namn:");
 
 			if (nodeName != null) {
-				if (!nodeName.equals("")) {
+				if (!(nodeName.trim()).equals("")) {
 					Node nod = new Node(nodeName, mev.getX(), mev.getY());
 					center.add(nod);
 					nod.addMouseListener(new NodeClickListener());
 					center.repaint();
 					allNodes.add(nod);
+					graph.add(nod.getStad());
 					listModel.addSorted(nod.getStad());
 				}
 			}
@@ -313,7 +365,7 @@ public class PathFinder extends JFrame {
 			}
 		}
 	}
-	
+
 	/*
 	 * När man väljer en stad från nåon av listorna
 	 */
@@ -322,90 +374,139 @@ public class PathFinder extends JFrame {
 		public void valueChanged(ListSelectionEvent lev) {
 			JList listTemp = (JList) lev.getSource();
 			Stad stadTemp = (Stad) listTemp.getSelectedValue();
-			
-			//Undviker dubbla event
+
+			// Undviker dubbla event
 			if (!listTemp.getValueIsAdjusting()) {
-				
-				//Om eventet kommer från listFrom
+
+				// Om eventet kommer från listFrom
 				if (listTemp == listFrom) {
-					//Kollar så att man inte har samma stad som "to"
-					if(stadTemp != ((Stad) listTo.getSelectedValue())){
-						
-						//Avmarkerar markerade staden på kartan
-						for(Node nod : allNodes){
-							if (nod.getStad() == stadFrom){
+					// Kollar så att man inte har samma stad som "to"
+					if (stadTemp != ((Stad) listTo.getSelectedValue())) {
+
+						// Avmarkerar markerade staden på kartan
+						for (Node nod : allNodes) {
+							if (nod.getStad() == stadFrom) {
 								nod.clicked();
 								break;
 							}
 						}
-						
+
 						stadFrom = stadTemp;
-						
-						//Markerar nya staden på kartan
-						for(Node nod : allNodes){
-							if (nod.getStad() == stadFrom){
+
+						// Markerar nya staden på kartan
+						for (Node nod : allNodes) {
+							if (nod.getStad() == stadFrom) {
 								nod.clicked();
 								break;
 							}
 						}
 					}
-					
-					else if(stadFrom != null){
+
+					else if (stadFrom != null) {
 						listFrom.setSelectedValue(stadFrom, true);
-					}
-					else{
+					} else {
 						listFrom.clearSelection();
 					}
 
-				}//listFrom
-				
-				//Om eventet kommer från listTo
+				}// listFrom
+
+				// Om eventet kommer från listTo
 				else if (listTemp == listTo) {
-					//Kollar så att man inte har samma stad som "from"
-					if(stadTemp != ((Stad) listFrom.getSelectedValue())){
-						
-						//Avmarkerar markerade staden på kartan
-						for (Node nod : allNodes){
-							if (nod.getStad()==stadTo){
+					// Kollar så att man inte har samma stad som "from"
+					if (stadTemp != ((Stad) listFrom.getSelectedValue())) {
+
+						// Avmarkerar markerade staden på kartan
+						for (Node nod : allNodes) {
+							if (nod.getStad() == stadTo) {
 								nod.clicked();
 								break;
 							}
 						}
-						
+
 						stadTo = stadTemp;
-						
-						//Markerar nya staden på kartan
-						for (Node nod : allNodes){
-							if (nod.getStad() == stadTo){
+
+						// Markerar nya staden på kartan
+						for (Node nod : allNodes) {
+							if (nod.getStad() == stadTo) {
 								nod.clicked();
 								break;
 							}
 						}
 					}
-					// Flyttar tillbaka selection till föregående om 
-					else if(stadTo != null){
+					// Flyttar tillbaka selection till föregående om
+					else if (stadTo != null) {
 						listTo.setSelectedValue(stadTo, true);
-					}
-					else{
+					} else {
 						listTo.clearSelection();
 					}
-					
-				}//listTo
 
-			}//getValueIsAdjusting
-			
-		}//valueChanged
+				}// listTo
+
+			}// getValueIsAdjusting
+
+		}// valueChanged
 	}
 
+	/*
+	 * Ny förbindelse
+	 */
 	private class NewConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			if (center == null) // Om ingen karta finns
+				return;
+			int check = twoNodesCheck();
 
+			if (check == 1) { // Om två städer är markerade
+				NewConnectionDialog dialog = new NewConnectionDialog(stadFrom,
+						stadTo);
+				for (;;) { // Metoden går runt tills rätt input eller avbuten
+					try {
+
+						int answer = JOptionPane.showConfirmDialog(null,
+								dialog, "Ny förbindelse",
+								JOptionPane.YES_NO_OPTION);
+						if (answer != JOptionPane.YES_OPTION) {
+							return;
+
+						} else { // Användaren
+									// tycker på JA
+							if ((dialog.getName().trim()).equals("")) {
+								JOptionPane
+										.showMessageDialog(
+												null,
+												"Du måste skriva in ett namn på förbindelsen.",
+												"Skriv in namn",
+												JOptionPane.ERROR_MESSAGE);
+							} else { // Om allt lyckas och användaren trycker på
+										// JA
+								graph.connect(stadFrom, stadTo,
+										dialog.getName(), dialog.getTime());
+								return;
+							}
+
+						} // Om svar = ja (else)
+
+					} catch (NumberFormatException err) {
+						JOptionPane.showMessageDialog(null,
+								"Fältet tid kräver ett numeriskt heltal.",
+								"Fel värde i fältet tid",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} // For
+			}
 		}
 	}
 
 	private class ChangeConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
+			int check = twoNodesCheck();
+			if (check == 1 && graph.getEdgesBetween(stadFrom, stadTo).size() != 0){
+				if(graph.getEdgesBetween(stadFrom, stadTo).size() > 1){
+					Edge<Stad> selection = (Edge<Stad>) JOptionPane.showInputDialog(null, "Vilken förbindelse vill du ändra?", "Ändra förbindelse", JOptionPane.QUESTION_MESSAGE, null, graph.getEdgesBetween(stadFrom, stadTo).toArray(), null);
+				}else
+					System.out.println("bara en yO!");
+				
+			}
 		}
 	}
 
