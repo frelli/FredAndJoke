@@ -59,6 +59,8 @@ public class ListGraph<T> implements Graph<T> {
 		 */
 		Edge<T> eFrom = new Edge<T>(to, n, v);
 		Edge<T> eTo = new Edge<T>(from, n, v);
+		eFrom.setEdgeBack(eTo);
+		eTo.setEdgeBack(eFrom);
 
 		/*
 		 * Här läggs en edge för vardera stad till i dess arrayList. Anledningen

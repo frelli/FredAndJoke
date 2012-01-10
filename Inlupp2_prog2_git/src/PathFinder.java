@@ -128,6 +128,7 @@ public class PathFinder extends JFrame {
 
 		menuQuit = new JMenuItem("Avsluta");
 		arkiv.add(menuQuit);
+		menuQuit.addActionListener()
 
 		// Operationsfliken
 		operations = new JMenu("Operationer");
@@ -192,8 +193,6 @@ public class PathFinder extends JFrame {
 		public void actionPerformed(ActionEvent ave) {
 			if (center != null)
 				remove(center);
-			center = new CenterPanel();
-			add(BorderLayout.CENTER, center);
 
 			FileNameExtensionFilter fnef = new FileNameExtensionFilter(
 					"Bilder", "jpg", "jpeg", "gif", "png");
@@ -206,7 +205,11 @@ public class PathFinder extends JFrame {
 			if (status == JFileChooser.APPROVE_OPTION) {
 				String filePath = chooser.getSelectedFile().getAbsolutePath()
 						.toLowerCase(); // hela filnamnet+sökväg
-
+				
+				//Skapar och lägger till center
+				center = new CenterPanel();
+				add(BorderLayout.CENTER, center);
+				
 				// Kollar så att filen är en bildfil som blivit vald
 				if (filePath.endsWith(".jpg") || filePath.endsWith("jpeg")
 						|| filePath.endsWith(".gif")
@@ -251,6 +254,7 @@ public class PathFinder extends JFrame {
 					// Skapar grafen
 					graph = new ListGraph<Stad>();
 
+					
 					validate();
 					pack();
 					setLocationRelativeTo(null);
@@ -263,22 +267,42 @@ public class PathFinder extends JFrame {
 
 	private class FindPathListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null)
-				return;
-			twoNodesCheck();
-		}
-	}
+			if (center == null) return;
+			int check = twoNodesCheck();
+			if (check == 1) {
+				List<Edge<Stad>> shortestPath = GraphMethods.shortestPath(
+						graph, stadFrom, stadTo);
+				if (shortestPath == null) {
+					JOptionPane.showMessageDialog(
+							getContentPane(),
+							"Det finns ingen väg att gå från "
+									+ stadFrom.getNamn() + " till "
+									+ stadTo.getNamn() + ".", "Fel",
+							JOptionPane.ERROR_MESSAGE);
+				} // Om det inte finns någon väg mellan de två markerade städerna 
+				else {
+					ShowFastestPathDialog sfpdialog = new ShowFastestPathDialog(
+							shortestPath, stadFrom, stadTo);
+					JOptionPane.showMessageDialog(null, sfpdialog,
+							"Snabbaste vägen", JOptionPane.INFORMATION_MESSAGE);
+				} // Snabbastevägdialog
+			} // Om två städer är markerade
+		} // actionPerformed
+	} // class
 
 	private class ShowConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null)
-				return;
+			if (center == null) return;
 			if (twoNodesCheck() == 1) {
-				if (GraphMethods.pathExists(graph, stadFrom, stadTo)){
-					ShowConnectionDialog dialog = new ShowConnectionDialog(graph.getEdgesBetween(stadFrom, stadTo), stadFrom, stadTo);
-					JOptionPane.showMessageDialog(null, dialog, "Visa förbindelse", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else {
+				if (GraphMethods.pathExists(graph, stadFrom, stadTo)) {
+					ShowConnectionDialog dialog = new ShowConnectionDialog(
+							graph.getEdgesBetween(stadFrom, stadTo), stadFrom,
+							stadTo);
+					JOptionPane
+							.showMessageDialog(null, dialog,
+									"Visa förbindelse",
+									JOptionPane.INFORMATION_MESSAGE);
+				} else {
 					JOptionPane.showMessageDialog(
 							getContentPane(),
 							"Det finns ingen förbindelse mellan "
@@ -326,6 +350,7 @@ public class PathFinder extends JFrame {
 			center.setCursor(Cursor.getDefaultCursor());
 		}
 	}
+	
 
 	/*
 	 * När noder på kartan klickas
@@ -365,6 +390,7 @@ public class PathFinder extends JFrame {
 			}
 		}
 	}
+	
 
 	/*
 	 * När man väljer en stad från nåon av listorna
@@ -446,14 +472,14 @@ public class PathFinder extends JFrame {
 
 		}// valueChanged
 	}
+	
 
 	/*
 	 * Ny förbindelse
 	 */
 	private class NewConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null) // Om ingen karta finns
-				return;
+			if (center == null) return;
 			int check = twoNodesCheck();
 
 			if (check == 1) { // Om två städer är markerade
@@ -496,18 +522,87 @@ public class PathFinder extends JFrame {
 			}
 		}
 	}
+	
 
 	private class ChangeConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			if (center == null) return;
+			
+			Edge<Stad> edgeSelected;
 			int check = twoNodesCheck();
-			if (check == 1 && graph.getEdgesBetween(stadFrom, stadTo).size() != 0){
-				if(graph.getEdgesBetween(stadFrom, stadTo).size() > 1){
-					Edge<Stad> selection = (Edge<Stad>) JOptionPane.showInputDialog(null, "Vilken förbindelse vill du ändra?", "Ändra förbindelse", JOptionPane.QUESTION_MESSAGE, null, graph.getEdgesBetween(stadFrom, stadTo).toArray(), null);
-				}else
-					System.out.println("bara en yO!");
-				
-			}
+			if (check == 1) {
+				if (graph.getEdgesBetween(stadFrom, stadTo).size() != 0) {
+					if (graph.getEdgesBetween(stadFrom, stadTo).size() > 1) {
+						edgeSelected = (Edge<Stad>) JOptionPane
+								.showInputDialog(null,
+										"Vilken förbindelse vill du ändra?",
+										"Ändra förbindelse",
+										JOptionPane.QUESTION_MESSAGE, null,
+										graph.getEdgesBetween(stadFrom, stadTo)
+												.toArray(), null);
+						if (edgeSelected == null) // Om användaren trycker
+													// avbryt
+							return;
+					} // slut getEdgesBetween size > 1
+					else
+						edgeSelected = graph.getEdgesBetween(stadFrom, stadTo)
+								.get(0);
+					ConnectionChanger(edgeSelected);
+
+				} // slut getEdgesBetween != 0
+				else
+					JOptionPane
+							.showMessageDialog(
+									getContentPane(),
+									"Det finns ingen förbindelse mellan de två markerade städerna.",
+									"Fel", JOptionPane.ERROR_MESSAGE);
+
+			}// slut check == 1
+				// inte till och från
 		}
+	}
+	
+
+	public void ConnectionChanger(Edge<Stad> current) {
+		Edge<Stad> edgeCurrent = current;
+		Edge<Stad> edgeBack = edgeCurrent.getEdgeBack();
+
+		NewConnectionDialog dialog = new NewConnectionDialog(stadFrom, stadTo);
+		dialog.setName(edgeCurrent.getNamn());
+		dialog.setTime(edgeCurrent.getVikt());
+
+		for (;;) { // Metoden går runt tills rätt input eller avbuten
+			try {
+
+				int answer = JOptionPane.showConfirmDialog(null, dialog,
+						"Ändra förbindelse", JOptionPane.YES_NO_OPTION);
+				if (answer != JOptionPane.YES_OPTION) {
+					return;
+
+				} else { // Användaren
+							// tycker på JA
+					if ((dialog.getName().trim()).equals("")) {
+						JOptionPane.showMessageDialog(null,
+								"Du måste skriva in ett namn på förbindelsen.",
+								"Skriv in namn", JOptionPane.ERROR_MESSAGE);
+					} else { // Om allt lyckas och användaren trycker på
+								// JA
+						edgeCurrent.setNamn(dialog.getName());
+						edgeBack.setNamn(dialog.getName());
+						edgeCurrent.setVikt(dialog.getTime());
+						edgeBack.setVikt(dialog.getTime());
+						return;
+					}
+
+				} // Om svar = ja (else)
+
+			} catch (NumberFormatException err) {
+				JOptionPane.showMessageDialog(null,
+						"Fältet tid kräver ett numeriskt heltal.",
+						"Fel värde i fältet tid", JOptionPane.ERROR_MESSAGE);
+			}
+		} // For
+
 	}
 
 	public static void main(String[] args) {

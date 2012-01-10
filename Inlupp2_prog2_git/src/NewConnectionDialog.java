@@ -35,9 +35,17 @@ public class NewConnectionDialog extends JPanel {
 	public String getName() {
 		return tName.getText();
 	}
+	
+	public void setName(String name){
+		tName.setText(name);		
+	}
 
 	public int getTime() {
 		return Integer.parseInt(tTime.getText());
+	}
+	
+	public void setTime(int time){
+		tTime.setText(String.valueOf(time));
 	}
 
 }
