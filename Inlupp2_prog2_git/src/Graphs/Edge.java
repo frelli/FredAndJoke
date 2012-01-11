@@ -5,7 +5,7 @@ public class Edge<T> {
 	private int vikt;
 	private Edge<T> edgeBack; //Så att man vet vilken det motsvarande edge-objektet är hos dest
 
-	public Edge(T dest, String namn, int vikt) {
+	Edge(T dest, String namn, int vikt) {
 		this.dest = dest;
 		this.namn = namn;
 		this.vikt = vikt;
@@ -36,6 +36,8 @@ public class Edge<T> {
 	}
 
 	public void setVikt(int vikt) {
+		if(vikt < 0)
+			throw new IllegalArgumentException("Vikten får ej vara negativ.");
 		this.vikt = vikt;
 	}
 

@@ -53,7 +53,10 @@ public class ListGraph<T> implements Graph<T> {
 		if (fromList == null || toList == null) {
 			throw new NoSuchElementException("Ingen stad adderad vid connect.");
 		}
-
+		
+		if (v < 0){
+			throw new IllegalArgumentException("Vikten får ej vara negativ.");
+		}
 		/*
 		 * Skapar edge-objekt för både till- och frånstaden
 		 */
@@ -80,6 +83,10 @@ public class ListGraph<T> implements Graph<T> {
 	 * @return Returnerar en ArrayList med stadens kopplingar
 	 * */
 	public List<Edge<T>> getEdgesFrom(T std) {
+		if (nodes.get(std) == null)
+			throw new NoSuchElementException(
+					"Kontrollera att staden är adderad till grafen.");
+		
 		return new ArrayList<Edge<T>>(nodes.get(std));
 	}
 
@@ -151,6 +158,4 @@ public class ListGraph<T> implements Graph<T> {
 		return str;
 
 	}
-
-
 }

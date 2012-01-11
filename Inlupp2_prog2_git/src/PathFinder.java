@@ -119,16 +119,23 @@ public class PathFinder extends JFrame {
 
 		menuOpen = new JMenuItem("Öppna");
 		arkiv.add(menuOpen);
+		menuOpen.addActionListener(new NotImplementedListener());
 
 		menuSave = new JMenuItem("Spara");
 		arkiv.add(menuSave);
+		menuSave.addActionListener(new NotImplementedListener());
 
 		menuSaveAs = new JMenuItem("Spara som...");
 		arkiv.add(menuSaveAs);
+		menuSaveAs.addActionListener(new NotImplementedListener());
 
 		menuQuit = new JMenuItem("Avsluta");
 		arkiv.add(menuQuit);
-		menuQuit.addActionListener()
+		menuQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ave) {
+				System.exit(0);
+			}
+		});
 
 		// Operationsfliken
 		operations = new JMenu("Operationer");
@@ -154,7 +161,6 @@ public class PathFinder extends JFrame {
 		menuChangeConnection = new JMenuItem("Ändra förbindelse");
 		operations.add(menuChangeConnection);
 		menuChangeConnection.addActionListener(new ChangeConnectionListener());
-		// System.exit(0);
 
 	}
 
@@ -193,23 +199,26 @@ public class PathFinder extends JFrame {
 		public void actionPerformed(ActionEvent ave) {
 			if (center != null)
 				remove(center);
-
-			FileNameExtensionFilter fnef = new FileNameExtensionFilter(
-					"Bilder", "jpg", "jpeg", "gif", "png");
-			chooser.addChoosableFileFilter(fnef);
-			chooser.setAcceptAllFileFilterUsed(false);
-			chooser.setFileFilter(fnef);
+			else {
+				FileNameExtensionFilter fnef = new FileNameExtensionFilter(
+						"Bilder", "jpg", "jpeg", "gif", "png");
+				chooser.addChoosableFileFilter(fnef);
+				chooser.setAcceptAllFileFilterUsed(false);
+				chooser.setFileFilter(fnef);
+			}
 			int status = chooser.showOpenDialog(null);
 
 			// Om användaren trycker på open
 			if (status == JFileChooser.APPROVE_OPTION) {
 				String filePath = chooser.getSelectedFile().getAbsolutePath()
 						.toLowerCase(); // hela filnamnet+sökväg
-				
-				//Skapar och lägger till center
+
+				stadFrom = null;
+				stadTo = null;
+				// Skapar och lägger till center
 				center = new CenterPanel();
 				add(BorderLayout.CENTER, center);
-				
+
 				// Kollar så att filen är en bildfil som blivit vald
 				if (filePath.endsWith(".jpg") || filePath.endsWith("jpeg")
 						|| filePath.endsWith(".gif")
@@ -254,7 +263,6 @@ public class PathFinder extends JFrame {
 					// Skapar grafen
 					graph = new ListGraph<Stad>();
 
-					
 					validate();
 					pack();
 					setLocationRelativeTo(null);
@@ -267,7 +275,8 @@ public class PathFinder extends JFrame {
 
 	private class FindPathListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null) return;
+			if (center == null)
+				return;
 			int check = twoNodesCheck();
 			if (check == 1) {
 				List<Edge<Stad>> shortestPath = GraphMethods.shortestPath(
@@ -279,7 +288,8 @@ public class PathFinder extends JFrame {
 									+ stadFrom.getNamn() + " till "
 									+ stadTo.getNamn() + ".", "Fel",
 							JOptionPane.ERROR_MESSAGE);
-				} // Om det inte finns någon väg mellan de två markerade städerna 
+				} // Om det inte finns någon väg mellan de två markerade
+					// städerna
 				else {
 					ShowFastestPathDialog sfpdialog = new ShowFastestPathDialog(
 							shortestPath, stadFrom, stadTo);
@@ -292,7 +302,8 @@ public class PathFinder extends JFrame {
 
 	private class ShowConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null) return;
+			if (center == null)
+				return;
 			if (twoNodesCheck() == 1) {
 				if (GraphMethods.pathExists(graph, stadFrom, stadTo)) {
 					ShowConnectionDialog dialog = new ShowConnectionDialog(
@@ -350,7 +361,6 @@ public class PathFinder extends JFrame {
 			center.setCursor(Cursor.getDefaultCursor());
 		}
 	}
-	
 
 	/*
 	 * När noder på kartan klickas
@@ -390,7 +400,6 @@ public class PathFinder extends JFrame {
 			}
 		}
 	}
-	
 
 	/*
 	 * När man väljer en stad från nåon av listorna
@@ -472,14 +481,14 @@ public class PathFinder extends JFrame {
 
 		}// valueChanged
 	}
-	
 
 	/*
 	 * Ny förbindelse
 	 */
 	private class NewConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null) return;
+			if (center == null)
+				return;
 			int check = twoNodesCheck();
 
 			if (check == 1) { // Om två städer är markerade
@@ -517,17 +526,22 @@ public class PathFinder extends JFrame {
 								"Fältet tid kräver ett numeriskt heltal.",
 								"Fel värde i fältet tid",
 								JOptionPane.ERROR_MESSAGE);
+					} catch (IllegalArgumentException iae) {
+						JOptionPane.showMessageDialog(null,
+								"Fältet tid får ej vara negativt.",
+								"Fel värde i fältet tid",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				} // For
 			}
 		}
 	}
-	
 
 	private class ChangeConnectionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (center == null) return;
-			
+			if (center == null)
+				return;
+
 			Edge<Stad> edgeSelected;
 			int check = twoNodesCheck();
 			if (check == 1) {
@@ -561,7 +575,6 @@ public class PathFinder extends JFrame {
 				// inte till och från
 		}
 	}
-	
 
 	public void ConnectionChanger(Edge<Stad> current) {
 		Edge<Stad> edgeCurrent = current;
@@ -600,11 +613,26 @@ public class PathFinder extends JFrame {
 				JOptionPane.showMessageDialog(null,
 						"Fältet tid kräver ett numeriskt heltal.",
 						"Fel värde i fältet tid", JOptionPane.ERROR_MESSAGE);
+
+			} catch (IllegalArgumentException iae) {
+				JOptionPane.showMessageDialog(null,
+						"Fältet tid får eh vara negativt.",
+						"Fel värde i fältet tid", JOptionPane.ERROR_MESSAGE);
 			}
 		} // For
 
 	}
 
+	private class NotImplementedListener implements ActionListener{
+
+		public void actionPerformed(ActionEvent ave) {
+			JOptionPane.showMessageDialog(null,
+					"Denna funktion är ej ännu implementerad.",
+					"Coming soon!", JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		new PathFinder();
 	}
